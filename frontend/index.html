@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aadash Coaching Center - Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Aadash Coaching Center</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="students.html"><i class="fas fa-user-graduate"></i> Students</a></li>
+            <li><a href="faculty.html"><i class="fas fa-chalkboard-teacher"></i> Faculty</a></li>
+            <li><a href="fees.html"><i class="fas fa-rupee-sign"></i> Fees</a></li>
+        </ul>
+    </nav>
+
+    <main class="dashboard">
+        <div class="dashboard-header">
+            <h1>Dashboard Overview</h1>
+            <p class="dashboard-subtitle">Complete overview with clickable details</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card students">
+                <div class="stat-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Students</h3>
+                    <span class="stat-number" id="totalStudents">
+                        <div class="spinner"></div>
+                    </span>
+                    <p class="stat-change">Active enrollments</p>
+                </div>
+            </div>
+            
+            <div class="stat-card faculty">
+                <div class="stat-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Faculty</h3>
+                    <span class="stat-number" id="totalFaculty">
+                        <div class="spinner"></div>
+                    </span>
+                    <p class="stat-change">Teaching staff</p>
+                </div>
+            </div>
+            
+            <div class="stat-card fees">
+                <div class="stat-icon">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Classes</h3>
+                    <span class="stat-number" id="totalClasses">
+                        <div class="spinner"></div>
+                    </span>
+                    <p class="stat-change">Active classes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Overview -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3><i class="fas fa-users"></i> Students Overview (Click names for details)</h3>
+                <div class="section-filters">
+                    <select id="dashboardClassFilter">
+                        <option value="">All Classes</option>
+                    </select>
+                    <a href="students.html" class="view-all-btn">Manage Students</a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="overview-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Phone</th>
+                            <th>Monthly Fee</th>
+                            <th>Due Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsOverview">
+                        <tr>
+                            <td colspan="8" class="loading-cell">
+                                <div class="spinner"></div>
+                                <p>Loading students...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Faculty Overview -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chalkboard-teacher"></i> Faculty Overview (Click names for details)</h3>
+                <a href="faculty.html" class="view-all-btn">Manage Faculty</a>
+            </div>
+            <div class="table-responsive">
+                <table class="overview-table">
+                    <thead>
+                        <tr>
+                            <th>Faculty ID</th>
+                            <th>Name</th>
+                            <th>Subjects</th>
+                            <th>Phone</th>
+                            <th>Monthly Salary</th>
+                            <th>Last Paid</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="facultyOverview">
+                        <tr>
+                            <td colspan="7" class="loading-cell">
+                                <div class="spinner"></div>
+                                <p>Loading faculty...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Student Details Modal -->
+    <div id="dashboardStudentModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2 id="dashboardStudentTitle">Student Details</h2>
+                <span class="close" id="closeDashboardStudentModal">&times;</span>
+            </div>
+            <div class="student-details-content">
+                <div class="details-tabs">
+                    <button class="details-tab-btn active" data-tab="info">
+                        <i class="fas fa-user"></i> Information
+                    </button>
+                    <button class="details-tab-btn" data-tab="fees">
+                        <i class="fas fa-rupee-sign"></i> Fee History
+                    </button>
+                    <button class="details-tab-btn" data-tab="edit">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+
+                <div class="details-tab-content active" id="info-tab">
+                    <div id="dashboardStudentInfo"></div>
+                </div>
+
+                <div class="details-tab-content" id="fees-tab">
+                    <div id="dashboardStudentFees"></div>
+                </div>
+
+                <div class="details-tab-content" id="edit-tab">
+                    <form id="dashboardStudentEditForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Father's Name *</label>
+                                <input type="text" name="fatherName" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone *</label>
+                                <input type="tel" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Monthly Fee *</label>
+                                <input type="number" name="monthlyFee" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty Details Modal -->
+    <div id="dashboardFacultyModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2 id="dashboardFacultyTitle">Faculty Details</h2>
+                <span class="close" id="closeDashboardFacultyModal">&times;</span>
+            </div>
+            <div class="faculty-details-content">
+                <div class="details-tabs">
+                    <button class="details-tab-btn active" data-tab="faculty-info">
+                        <i class="fas fa-user"></i> Information
+                    </button>
+                    <button class="details-tab-btn" data-tab="salary-history">
+                        <i class="fas fa-money-bill-wave"></i> Salary History
+                    </button>
+                </div>
+
+                <div class="details-tab-content active" id="faculty-info-tab">
+                    <div id="dashboardFacultyInfo"></div>
+                </div>
+
+                <div class="details-tab-content" id="salary-history-tab">
+                    <div id="dashboardFacultySalary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
+
+
+
+
+

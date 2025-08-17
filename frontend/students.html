@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students - Aadash Coaching Center</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Add SheetJS for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Aadash Coaching Center</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="students.html" class="active"><i class="fas fa-user-graduate"></i> Students</a></li>
+            <li><a href="faculty.html"><i class="fas fa-chalkboard-teacher"></i> Faculty</a></li>
+            <li><a href="fees.html"><i class="fas fa-rupee-sign"></i> Fees</a></li>
+        </ul>
+    </nav>
+
+    <main class="students-page">
+        <div class="page-header">
+            <div class="header-left">
+                <h1><i class="fas fa-user-graduate"></i> Student Management</h1>
+                <p>Manage classes and students</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-success" id="exportStudentsExcelBtn">
+                    <i class="fas fa-file-excel"></i> Export Students Excel
+                </button>
+                <button class="btn-secondary" id="addClassBtn">
+                    <i class="fas fa-plus"></i> Create Class
+                </button>
+            </div>
+        </div>
+
+        <!-- Classes Section -->
+        <div class="classes-section">
+            <h3><i class="fas fa-school"></i> Classes</h3>
+            <div class="classes-grid" id="classesGrid">
+                <div class="loading-card">
+                    <div class="spinner"></div>
+                    <p>Loading classes...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div class="students-section" id="studentsSection" style="display: none;">
+            <div class="section-header">
+                <h3 id="selectedClassName">Students in Class</h3>
+                <div class="section-actions">
+                    <button class="btn-warning" id="exportClassExcelBtn" style="display: none;">
+                        <i class="fas fa-file-excel"></i> Export Class Excel
+                    </button>
+                    <button class="btn-primary" id="addStudentBtn" style="display: none;">
+                        <i class="fas fa-user-plus"></i> Add Student
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Father's Name</th>
+                            <th>Phone</th>
+                            <th>Monthly Fee</th>
+                            <th>Due/Overpaid</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Class Modal -->
+    <div id="classModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Class</h2>
+                <span class="close" id="closeClassModal">&times;</span>
+            </div>
+            <form id="classForm">
+                <div class="form-group">
+                    <label><i class="fas fa-school"></i> Class Name *</label>
+                    <input type="text" name="className" required placeholder="e.g., 8th, 10th, JEE">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-info-circle"></i> Description</label>
+                    <textarea name="description" placeholder="Optional description"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelClassBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="studentModalTitle">Add New Student</h2>
+                <span class="close" id="closeStudentModal">&times;</span>
+            </div>
+            <form id="studentForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Full Name *</label>
+                        <input type="text" name="fullName" required placeholder="Enter full name">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-male"></i> Father's Name *</label>
+                        <input type="text" name="fatherName" required placeholder="Enter father's name">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Phone *</label>
+                        <input type="tel" name="phone" required placeholder="Enter phone number" pattern="[6-9]\d{9}">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-school"></i> Select Class *</label>
+                        <select name="className" id="studentClassSelect" required>
+                            <option value="">Choose Class</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-rupee-sign"></i> Monthly Fee *</label>
+                    <input type="number" name="monthlyFee" required placeholder="Enter monthly fee amount">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelStudentBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Details Modal -->
+    <div id="studentDetailsModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2 id="studentDetailsTitle">Student Details</h2>
+                <span class="close" id="closeStudentDetailsModal">&times;</span>
+            </div>
+            <div class="student-details-content">
+                <div class="form-tabs">
+                    <button type="button" class="tab-btn active" data-tab="personal">
+                        <i class="fas fa-user"></i> Personal Info
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="fees">
+                        <i class="fas fa-rupee-sign"></i> Fee Details
+                    </button>
+                </div>
+
+                <div class="tab-content active" id="personal-tab">
+                    <div id="studentPersonalInfo"></div>
+                </div>
+
+                <div class="tab-content" id="fees-tab">
+                    <div id="feesSummary"></div>
+                    <div class="table-responsive">
+                        <table class="monthly-fees-table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Expected Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>Status</th>
+                                    <th>Payment Date</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyFeesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/students.js"></script>
+</body>
+</html>

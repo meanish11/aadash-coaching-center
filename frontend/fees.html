@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fees Management - Aadash Coaching Center</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Working PDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Aadash Coaching Center</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="students.html"><i class="fas fa-user-graduate"></i> Students</a></li>
+            <li><a href="faculty.html"><i class="fas fa-chalkboard-teacher"></i> Faculty</a></li>
+            <li><a href="fees.html" class="active"><i class="fas fa-rupee-sign"></i> Fees</a></li>
+        </ul>
+    </nav>
+
+    <main class="fees-page">
+        <div class="page-header">
+            <div class="header-left">
+                <h1><i class="fas fa-rupee-sign"></i> Fees Management</h1>
+                <p>Update student fees and faculty salaries</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" id="viewDueReportBtn">
+                    <i class="fas fa-chart-line"></i> Due/Overpaid Report
+                </button>
+                <button class="btn-primary" id="viewAnalyticsBtn">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </button>
+                <button class="btn-success" id="exportPDFBtn">
+                    <i class="fas fa-file-pdf"></i> Export PDF Report
+                </button>
+            </div>
+        </div>
+
+        <div class="fees-tabs">
+            <button class="tab-btn active" data-tab="student-fees">
+                <i class="fas fa-user-graduate"></i> Student Fees
+            </button>
+            <button class="tab-btn" data-tab="teacher-salary">
+                <i class="fas fa-chalkboard-teacher"></i> Teacher Salary
+            </button>
+        </div>
+
+        <!-- Student Fees Tab -->
+        <div class="tab-content active" id="student-fees">
+            <div class="fees-section">
+                <div class="section-header">
+                    <h3>Student Fee Management</h3>
+                    <div class="filter-group">
+                        <select id="classFilter">
+                            <option value="">All Classes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="fees-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Monthly Fee</th>
+                                <th>Total Paid</th>
+                                <th>Due/Overpaid</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentFeesTableBody">
+                            <tr>
+                                <td colspan="7" class="loading-cell">
+                                    <div class="spinner"></div>
+                                    <p>Loading student fees...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Salary Tab -->
+        <div class="tab-content" id="teacher-salary">
+            <div class="fees-section">
+                <div class="section-header">
+                    <h3>Faculty Salary Management</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="fees-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty ID</th>
+                                <th>Name</th>
+                                <th>Monthly Salary</th>
+                                <th>Last Paid</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherSalaryTableBody">
+                            <tr>
+                                <td colspan="5" class="loading-cell">
+                                    <div class="spinner"></div>
+                                    <p>Loading faculty salaries...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Analytics Modal -->
+    <div id="analyticsModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2>Financial Analytics & Reports</h2>
+                <span class="close" id="closeAnalyticsModal">&times;</span>
+            </div>
+            <div class="analytics-content">
+                <div class="analytics-tabs">
+                    <button class="analytics-tab-btn active" data-tab="monthly">Monthly</button>
+                    <button class="analytics-tab-btn" data-tab="quarterly">Quarterly</button>
+                    <button class="analytics-tab-btn" data-tab="yearly">Yearly</button>
+                </div>
+
+                <div class="analytics-summary">
+                    <div class="summary-cards">
+                        <div class="summary-card revenue">
+                            <h4>Total Revenue</h4>
+                            <div class="summary-value" id="totalRevenue">₹0</div>
+                        </div>
+                        <div class="summary-card expenses">
+                            <h4>Total Expenses</h4>
+                            <div class="summary-value" id="totalExpenses">₹0</div>
+                        </div>
+                        <div class="summary-card profit">
+                            <h4>Net Profit</h4>
+                            <div class="summary-value" id="netProfit">₹0</div>
+                        </div>
+                        <div class="summary-card margin">
+                            <h4>Profit Margin</h4>
+                            <div class="summary-value" id="profitMargin">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-section">
+                        <h4>Revenue vs Expenses</h4>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="chart-section">
+                        <h4>Monthly Trends</h4>
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="detailed-table">
+                    <h4>Detailed Financial Report</h4>
+                    <div class="table-responsive">
+                        <table id="financialDetailsTable">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Student Fees</th>
+                                    <th>Faculty Salaries</th>
+                                    <th>Other Expenses</th>
+                                    <th>Net Profit/Loss</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financialDetailsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Payment Modal -->
+    <div id="monthlyPaymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="monthlyPaymentModalTitle">Add Monthly Fee Payment</h2>
+                <span class="close" id="closeMonthlyPaymentModal">&times;</span>
+            </div>
+            <form id="monthlyPaymentForm">
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="monthlyPaymentStudentName" readonly>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Month *</label>
+                        <select name="month" required>
+                            <option value="">Select Month</option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Year *</label>
+                        <select name="year" required>
+                            <option value="">Select Year</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-rupee-sign"></i> Payment Amount *</label>
+                        <input type="number" name="amount" required min="1" placeholder="Enter amount">
+                        <small class="monthly-fee-hint" id="monthlyFeeHint"></small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-credit-card"></i> Payment Mode</label>
+                        <select name="paymentMode">
+                            <option value="Cash">Cash</option>
+                            <option value="Online">Online</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Card">Card</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> Remarks</label>
+                    <textarea name="remarks" placeholder="Optional remarks"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelMonthlyPaymentBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Record Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Due/Overpaid Report Modal -->
+    <div id="dueReportModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2>Due/Overpaid Report</h2>
+                <span class="close" id="closeDueReportModal">&times;</span>
+            </div>
+            <div class="report-content">
+                <div class="report-summary" id="reportSummary">
+                    <div class="spinner"></div>
+                    <p>Loading report...</p>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Monthly Fee</th>
+                                <th>Total Paid</th>
+                                <th>Due/Overpaid Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dueReportTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty Salary Payment Modal -->
+    <div id="salaryPaymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pay Faculty Salary</h2>
+                <span class="close" id="closeSalaryPaymentModal">&times;</span>
+            </div>
+            <form id="salaryPaymentForm">
+                <div class="form-group">
+                    <label>Faculty Name</label>
+                    <input type="text" id="salaryPaymentFacultyName" readonly>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Month *</label>
+                        <input type="text" name="month" required placeholder="e.g., January 2025">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-rupee-sign"></i> Amount *</label>
+                        <input type="number" name="amount" required min="1" placeholder="Salary amount">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-minus-circle"></i> Deductions</label>
+                        <input type="number" name="deductions" value="0" min="0" placeholder="Any deductions">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> Remarks</label>
+                        <input type="text" name="remarks" placeholder="Optional remarks">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelSalaryPaymentBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Record Salary Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/fees.js"></script>
+</body>
+</html>

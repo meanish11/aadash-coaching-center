@@ -81,3 +81,10 @@ Express.js: Web application framework
 MongoDB: NoSQL database for data storage
 
 Mongoose: MongoDB object modeling library
+
+Development Tools
+NPM: Package management
+
+Nodemon: Development server auto-restart
+
+CORS: Cross-origin resource sharing
